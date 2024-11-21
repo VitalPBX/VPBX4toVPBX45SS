@@ -22,7 +22,7 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
    ```bash
    ./vpbx4tovpbx45.sh
 
-### Configuration Prompts During Script Execution
+Configuration Prompts During Script Execution
 
 When running the script, you may encounter prompts like the following:
    ```bash
