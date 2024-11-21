@@ -1,10 +1,18 @@
 #!/bin/bash
 
-# Warning
-# Do this at your own risk, I tested this on a lab PBX not in production.
-# Take a checkpoint/snapshot beforehand, in case you need to roll back
-# Script to upgrade Debian 11 to Debian 12 and clean up old kernels
-# Make sure to run this script with superuser privileges (sudo)
+# Display warning in a bold, red format
+echo -e "\033[1;31m###############################################\033[0m"
+echo -e "\033[1;31m# WARNING                                    #\033[0m"
+echo -e "\033[1;31m#                                            #\033[0m"
+echo -e "\033[1;31m# Do this at your own risk!                  #\033[0m"
+echo -e "\033[1;31m# This script was tested on a lab PBX,       #\033[0m"
+echo -e "\033[1;31m# not in production.                         #\033[0m"
+echo -e "\033[1;31m#                                            #\033[0m"
+echo -e "\033[1;31m# Take a checkpoint/snapshot beforehand,     #\033[0m"
+echo -e "\033[1;31m# in case you need to roll back.             #\033[0m"
+echo -e "\033[1;31m#                                            #\033[0m"
+echo -e "\033[1;31m# Make sure to run this script with sudo.    #\033[0m"
+echo -e "\033[1;31m###############################################\033[0m"
 
 read -p "Are you sure you want to proceed? (yes/no): " confirmation
 # Check the user's input
