@@ -33,9 +33,9 @@ apt dist-upgrade -y
 echo "Removing unnecessary packages..."
 apt autoremove --purge -y
 
-# Step 3: Check the current Debian version
-echo "Checking the current Debian version..."
-lsb_release -a
+# Step 3: Check VitalPBX Integrity
+echo "Checking VitalPBX Integrityn..."
+vitalpbx check-integrity
 
 # Step 4: Change repositories to Debian 12 (bookworm)
 echo "Updating repositories to Debian 12..."
@@ -76,7 +76,7 @@ apt remove apache2 -y
 
 # Step 10: Re-Install-Upgrade VitalPBX
 apt update
-apt reinstall vitalpbx -y
+apt full-upgrade -y
 
 # Step 11: Remove old packages
 apt autoremove -y
