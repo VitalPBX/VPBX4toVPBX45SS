@@ -37,10 +37,12 @@ apt autoremove --purge -y
 echo "Checking VitalPBX Integrityn..."
 vitalpbx check-integrity
 
-# Step 4: Change repositories to Debian 12 (bookworm)
+# Step 4: Change repositories to Debian 12 (bookworm) and VitalPBBX
 echo "Updating repositories to Debian 12..."
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
+echo "Update VitalPBX Repo to V4.5:"
+sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
 
 # Step 5: Upgrade to Debian 12
 # Set non-interactive mode globally
@@ -65,24 +67,22 @@ apt clean -y
 echo "Updating GRUB..."
 update-grub
 
-# Step 8: Update VitalPBX Repo to V4.5
-echo "Update VitalPBX Repo to V4.5:"
-sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
-
-# Step 9: Stop and disable apache2 service
+# Step 8: Stop and disable apache2 service
 systemctl stop apache2.service
 systemctl disable apache2.service
 apt remove apache2 -y
 
-# Step 10: Re-Install-Upgrade VitalPBX
-apt update
+# Step 9: Re-Install-Upgrade VitalPBX
 apt reinstall vitalpbx -y
 
-# Step 11: Remove old packages
+# Step 10: Remove Hotel Management Module (Deprecate in V4.5)
+apt remove vitalpbx-hotel-management -y
+
+# Step 12: Remove old packages
 apt autoremove -y
 rm -rf /etc/nginx/sites-enabled/default
 echo "=== Upgrade process completed ==="
 
-# Step 12: Restart the system
+# Step 13: Restart the system
 echo "Rebooting the system to apply changes..."
 reboot
