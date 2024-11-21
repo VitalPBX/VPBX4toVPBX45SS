@@ -76,7 +76,7 @@ apt remove apache2 -y
 
 # Step 10: Re-Install-Upgrade VitalPBX
 apt update
-apt full-upgrade -y
+apt reinstall vitalpbx -y
 
 # Step 11: Remove old packages
 apt autoremove -y
