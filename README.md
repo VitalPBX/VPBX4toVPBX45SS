@@ -36,7 +36,7 @@ When running the script, you may encounter prompts like the following:
    *** firewalld.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
 
 ---
-## 📋 Script Steps
+## 📋 Detailed Explanation of Script Workflow
 
 1. **User Confirmation**  
    Prompts the user to confirm before proceeding with the upgrade.
