@@ -45,81 +45,81 @@ dpkg --list | grep 'linux-image-5' | awk '{print $2}' | grep -v "$(uname -r)" | 
 ---
 ## 📋 How the Script Works
 
-Step 1: Update the current system
+**Step 1:** Update the current system
 Ensures all current packages on Debian 11 are up-to-date.
 ```
 apt update && apt upgrade -y
 apt dist-upgrade -y
 ```
-Step 2: Remove unnecessary packages
+**Step 2:** Remove unnecessary packages
 Cleans up packages that are no longer needed.
 ```
 apt autoremove --purge -y
 ```
-Step 3: Check VitalPBX Integrity
+**Step 3:** Check VitalPBX Integrity
 Verifies that the VitalPBX installation is valid before upgrading.
 ```
 vitalpbx check-integrity
 ```
-Step 4: Remove Hotel Management Module (Temporarily unavailable in V4.5)
+**Step 4:** Remove Hotel Management Module (Temporarily unavailable in V4.5)
 Uninstalls the hotel management module, which is no longer supported in version 4.5.
 ```
 apt remove vitalpbx-hotel-management -y
 ```
-Step 5: Change repositories to Debian 12 (bookworm) and VitalPBX
+**Step 5:** Change repositories to Debian 12 (bookworm) and VitalPBX
 Updates the Debian and VitalPBX repositories to point to the new versions.
 ```
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
 sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
 ```
-Step 6: Upgrade to Debian 12
+**Step 6:** Upgrade to Debian 12
 Prepares the system for non-interactive operations during the upgrade.
 ```
 export DEBIAN_FRONTEND=noninteractive
 ```
-Step 7: Prevent interactive prompts
+**Step 7:** Prevent interactive prompts
 Ensures no manual input is required during the package upgrades.
 ```
 echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 ```
-Step 8: Update and upgrade the system
+**Step 8:** Update and upgrade the system
 Performs the full system upgrade to Debian 12.
 ```
 apt update -y
 apt upgrade -yq
 apt dist-upgrade -yq
 ```
-Step 9: Clean up residual packages
+**Step 9:** Clean up residual packages
 Removes unnecessary residual packages and cleans cached files.
 ```
 apt autoremove --purge -y
 apt clean -y
 ```
-Step 10: Update GRUB bootloader
+**Step 10:** Update GRUB bootloader
 Updates GRUB to reflect the changes in the system.
 ```
 update-grub
 ```
-Step 11: Stop and disable apache2 service
+**Step 11:** Stop and disable apache2 service
 Stops and removes the Apache2 web server, as it is not needed for VitalPBX.
 ```
 systemctl stop apache2.service
 systemctl disable apache2.service
 apt remove apache2 -y
 ```
-Step 12: Re-Install-Upgrade VitalPBX
+**Step 12:** Re-Install-Upgrade VitalPBX
 Reinstalls VitalPBX to ensure compatibility with the new system.
 ```
 apt reinstall vitalpbx -y
 ```
-Step 13: Remove old packages
+**Step 13:** Remove old packages
 Cleans up any outdated packages and configurations.
 ```
 apt autoremove -y
 rm -rf /etc/nginx/sites-enabled/default
 ```
-Step 14: Restart the system
+**Step 14:** Restart the system
 Reboots the system to apply all the changes made during the upgrade.
 ```
 reboot
