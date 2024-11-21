@@ -25,7 +25,7 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
 ### Configuration Prompts During Script Execution
 
 When running the script, you may encounter prompts like the following:
-   ```text
+   ```bash
    *** mpm_event.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
    *** firewalld.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
 
