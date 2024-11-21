@@ -87,6 +87,7 @@ Configures the system to avoid interactive prompts during the upgrade process.
 10. Prevent Interactive Prompts
    ```bash
    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
 Prevents manual intervention by setting the default behavior for prompts.
 
 11. Upgrade to Debian 12
