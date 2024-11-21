@@ -1,18 +1,19 @@
 #!/bin/bash
 
 # Display warning in a bold, red format
-echo -e "\033[1;31m###############################################\033[0m"
-echo -e "\033[1;31m# WARNING                                    #\033[0m"
-echo -e "\033[1;31m#                                            #\033[0m"
-echo -e "\033[1;31m# Do this at your own risk!                  #\033[0m"
-echo -e "\033[1;31m# This script was tested on a lab PBX,       #\033[0m"
-echo -e "\033[1;31m# not in production.                         #\033[0m"
-echo -e "\033[1;31m#                                            #\033[0m"
-echo -e "\033[1;31m# Take a checkpoint/snapshot beforehand,     #\033[0m"
-echo -e "\033[1;31m# in case you need to roll back.             #\033[0m"
-echo -e "\033[1;31m#                                            #\033[0m"
-echo -e "\033[1;31m# Make sure to run this script with sudo.    #\033[0m"
-echo -e "\033[1;31m###############################################\033[0m"
+echo -e "\033[1;31m#########################################################\033[0m"
+echo -e "\033[1;31m#                      WARNING                          #\033[0m"
+echo -e "\033[1;31m#                                                       #\033[0m"
+echo -e "\033[1;31m# This script is intended for use in a lab environment. #\033[0m"
+echo -e "\033[1;31m# It has NOT been tested on production systems.         #\033[0m"
+echo -e "\033[1;31m#                                                       #\033[0m"
+echo -e "\033[1;31m# Proceed at your own risk!                             #\033[0m"
+echo -e "\033[1;31m#                                                       #\033[0m"
+echo -e "\033[1;31m# Before running, take a checkpoint or snapshot         #\033[0m"
+echo -e "\033[1;31m# to ensure you can roll back if necessary.             #\033[0m"
+echo -e "\033[1;31m#                                                       #\033[0m"
+echo -e "\033[1;31m# Run this script as root or with sudo privileges.      #\033[0m"
+echo -e "\033[1;31m#########################################################\033[0m"
 
 read -p "Are you sure you want to proceed? (yes/no): " confirmation
 # Check the user's input
