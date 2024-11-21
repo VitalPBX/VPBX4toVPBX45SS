@@ -40,6 +40,7 @@ lsb_release -a
 # Step 4: Change repositories to Debian 12 (bookworm)
 echo "Updating repositories to Debian 12..."
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
+sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
 
 # Step 5: Upgrade to Debian 12
 # Set non-interactive mode globally
@@ -52,12 +53,13 @@ apt update -y
 
 # Update and upgrade the system
 echo "Updating and upgrading the system..."
-apt upgrade -yq 
+apt upgrade -yq --force-confdef --force-confold
 apt dist-upgrade -yq
 
 # Step 6: Clean up residual packages
 echo "Removing residual packages..."
 apt autoremove --purge -y
+apt clean -y
 
 # Step 7: Update GRUB bootloader
 echo "Updating GRUB..."
