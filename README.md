@@ -1,6 +1,6 @@
-# Debian Upgrade and Cleanup Script
+# Debian Upgrade and Cleanup Script (Including VitalPBX 4 to 4.5 Migration)
 
-This script automates the process of upgrading a Debian 11 system to Debian 12 and performs cleanup tasks to optimize the environment. It is especially useful for testing environments but can be used in production systems **at your own risk**.
+This script automates the process of upgrading a Debian 11 system to Debian 12 and includes a seamless migration from **VitalPBX 4** to **VitalPBX 4.5**, along with cleanup tasks to optimize the environment. It is especially useful for testing environments but can be used in production systems **at your own risk**.
 
 ---
 
@@ -9,6 +9,13 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
 - **Backup before proceeding.** Take a snapshot or backup of your system before running this script to ensure you can roll back if needed.
 - **Superuser privileges required.** Make sure to run this script with `sudo` or as a root user.
 
+---
+## 🚀 How to Use
+
+1. Download the script file.
+2. Make the script executable:
+   ```bash
+   chmod +x upgrade_debian_vitalpbx.sh
 ---
 
 ## 📋 Script Steps
@@ -37,27 +44,19 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
 8. **Update GRUB Bootloader**  
    Ensures the bootloader is updated to reflect the changes.
 
-9. **Update VitalPBX Repository**  
-   Updates the VitalPBX repository to version 4.5.
+9. **Migrate VitalPBX from Version 4 to Version 4.5**  
+   Updates the VitalPBX repository in `/etc/apt/sources.list.d/vitalpbx.list` to reflect version 4.5 and reinstalls VitalPBX to apply the latest version.
 
 10. **Disable and Remove Apache2**  
     Stops and disables the `apache2` service and removes it from the system.
 
 11. **Reinstall and Upgrade VitalPBX**  
-    Reinstalls the latest version of VitalPBX.
+    Reinstalls the latest version of VitalPBX after updating the repositories.
 
 12. **Remove Default NGINX Configuration**  
-    Removes the default NGINX configuration file.
+    Removes the default NGINX configuration file for a cleaner setup.
 
 13. **Reboot the System**  
     Reboots the system to apply all changes.
 
 ---
-
-## 🚀 How to Use
-
-1. Clone the repository or download the script file.
-2. Make the script executable:
-   ```bash
-   chmod +x upgrade_debian.sh
-
