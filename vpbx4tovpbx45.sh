@@ -53,7 +53,7 @@ apt update -y
 
 # Update and upgrade the system
 echo "Updating and upgrading the system..."
-apt upgrade -yq --force-confdef --force-confold
+apt upgrade -yq
 apt dist-upgrade -yq
 
 # Step 6: Clean up residual packages
