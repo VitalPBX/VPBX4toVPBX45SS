@@ -41,9 +41,8 @@ When running the script, you may encounter prompts like the following:
 
 ---
 ## 📋 How the Script Works
-# Upgrade Process: Debian 11 to Debian 12 and VitalPBX 4 to 4.5
 
-## Step 1: Update the current system
+### Step 1: Update the current system
 Ensures all current packages on Debian 11 are up-to-date.
 ```bash
    apt update && apt upgrade -y
