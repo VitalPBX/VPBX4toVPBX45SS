@@ -44,7 +44,7 @@ When running the script, you may encounter prompts like the following:
 
 ### Step 1: Update the current system
 Ensures all current packages on Debian 11 are up-to-date.
-```
+```bash
 apt update && apt upgrade -y
 apt dist-upgrade -y
 
