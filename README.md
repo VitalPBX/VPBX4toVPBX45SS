@@ -4,10 +4,18 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
 
 ---
 
-## ⚠️ Warning
-- **Do this at your own risk.** This script has been tested on a lab PBX, not in a production environment.
-- **Backup before proceeding.** Take a snapshot or backup of your system before running this script to ensure you can roll back if needed.
-- **Superuser privileges required.** Make sure to run this script with `sudo` or as a root user.
+# ⚠️ Warning
+
+Migrating from **Debian 11** to **Debian 12**, as well as upgrading from **VitalPBX 4** to **VitalPBX 4.5** using this script, involves potential risks. 
+
+It is highly recommended to:
+
+- Create full backups or snapshots of your system before proceeding.
+- Test the script in a non-production environment to ensure stability.
+- Have a rollback plan in place in case of unexpected issues.
+- Run this script as root or with sudo privileges.
+
+**Proceed with caution!**
 
 ---
 ## 🚀 How to Use
