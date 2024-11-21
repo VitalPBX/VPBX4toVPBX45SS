@@ -70,5 +70,4 @@ When running the script, you may encounter prompts like the following:
 
 13. **Reboot the System**  
     Reboots the system to apply all changes.
-
 ---
