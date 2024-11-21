@@ -15,9 +15,11 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
 1. Download the script file.
    ```bash
 wget https://raw.githubusercontent.com/VitalPBX/VPBX4toVPBX45SS/refs/heads/main/vpbx4tovpbx45.sh
+---
 2. Make the script executable:
    ```bash
    chmod +x upgrade_debian_vitalpbx.sh
+---
 3. Execute the script:
    ```bash
 ./vpbx4tovpbx45.sh
