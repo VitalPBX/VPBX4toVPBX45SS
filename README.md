@@ -41,85 +41,88 @@ When running the script, you may encounter prompts like the following:
 
 ---
 ## 📋 How the Script Works
-1. Display a Warning Message
-The script begins by displaying a bold, red warning message, informing the user about the potential risks of running the script. It emphasizes the need for backups and lab testing.
+# Upgrade Process: Debian 11 to Debian 12 and VitalPBX 4 to 4.5
 
-2. Request User Confirmation
-The script asks the user to confirm whether they want to proceed. If the user does not type yes, the script exits without making changes.
+```bash
+echo "=== Starting the upgrade process from Debian 11 to Debian 12 ==="
 
-3. Update the Current System
-   ```bash
-   apt update && apt upgrade -y
-   apt dist-upgrade -y
-Performs a full update of the current Debian 11 system to ensure it's up-to-date.
+# Step 1: Update the current system
+# Ensures all current packages on Debian 11 are up-to-date.
+echo "Updating the current system..."
+apt update && apt upgrade -y
+apt dist-upgrade -y
 
-4. Remove Unnecessary Packages
-   ```bash
-   apt autoremove --purge -y
-Cleans up unused or obsolete packages.
+# Step 2: Remove unnecessary packages
+# Cleans up packages that are no longer needed.
+echo "Removing unnecessary packages..."
+apt autoremove --purge -y
 
-5. Check VitalPBX Integrity
-   ```bash
-   vitalpbx check-integrity
-Runs a VitalPBX command to ensure the installation is error-free before upgrading.
+# Step 3: Check VitalPBX Integrity
+# Verifies that the VitalPBX installation is valid before upgrading.
+echo "Checking VitalPBX Integrity..."
+vitalpbx check-integrity
 
-6. Remove the Hotel Management Module
-   ```bash
-   apt remove vitalpbx-hotel-management -y
-The hotel management module is deprecated in VitalPBX 4.5, so it is removed.
+# Step 4: Remove Hotel Management Module (Deprecate in V4.5)
+# Uninstalls the hotel management module, which is no longer supported in version 4.5.
+echo "Removing Hotel Management Module (deprecated in V4.5)..."
+apt remove vitalpbx-hotel-management -y
 
-7. Update Debian Repositories to Debian 12
-   ```bash
-   sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
-   sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
-Replaces Debian 11 (bullseye) repositories with Debian 12 (bookworm) repositories.
+# Step 5: Change repositories to Debian 12 (bookworm) and VitalPBX
+# Updates the Debian and VitalPBX repositories to point to the new versions.
+echo "Updating repositories to Debian 12..."
+sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
+sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
+echo "Updating VitalPBX Repo to V4.5..."
+sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
 
-8. Update VitalPBX Repository
-   ```bash
-   sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
-Updates the VitalPBX repository to point to version 4.5.
+# Step 6: Upgrade to Debian 12
+# Prepares the system for non-interactive operations during the upgrade.
+export DEBIAN_FRONTEND=noninteractive
 
-9. Set Non-Interactive Mode
-   ```bash
-   export DEBIAN_FRONTEND=noninteractive
-Configures the system to avoid interactive prompts during the upgrade process.
+# Step 7: Prevent interactive prompts
+# Ensures no manual input is required during the package upgrades.
+echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+echo "Updating the package list..."
+apt update -y
 
-10. Upgrade to Debian 12
-   ```bash
-   apt update -y
-   apt upgrade -yq
-   apt dist-upgrade -yq
-Performs the full upgrade to Debian 12.
+# Step 8: Update and upgrade the system
+# Performs the full system upgrade to Debian 12.
+echo "Updating and upgrading the system..."
+apt upgrade -yq
+apt dist-upgrade -yq
 
-11. Clean Residual Packages
-   ```bash
-   apt autoremove --purge -y
-   apt clean -y
-Removes unnecessary files and packages left over from the upgrade.
+# Step 9: Clean up residual packages
+# Removes unnecessary residual packages and cleans cached files.
+echo "Removing residual packages..."
+apt autoremove --purge -y
+apt clean -y
 
-12. Update GRUB Bootloader
-   ```bash
-   update-grub
-Updates the GRUB bootloader to reflect the changes in the system.
+# Step 10: Update GRUB bootloader
+# Updates GRUB to reflect the changes in the system.
+echo "Updating GRUB..."
+update-grub
 
-13. Stop and Remove Apache
-   ```bash
-   systemctl stop apache2.service
-   systemctl disable apache2.service
-   apt remove apache2 -y
-Stops and removes Apache, as it is not required for VitalPBX.
+# Step 11: Stop and disable apache2 service
+# Stops and removes the Apache2 web server, as it is not needed for VitalPBX.
+echo "Stopping and removing Apache2..."
+systemctl stop apache2.service
+systemctl disable apache2.service
+apt remove apache2 -y
 
-14. Reinstall VitalPBX
-   ```bash
-   apt reinstall vitalpbx -y
-Reinstalls VitalPBX to ensure compatibility with Debian 12.
+# Step 12: Re-Install-Upgrade VitalPBX
+# Reinstalls VitalPBX to ensure compatibility with the new system.
+echo "Reinstalling VitalPBX..."
+apt reinstall vitalpbx -y
 
-15. Remove Old Nginx Configuration
-   ```bash
-   rm -rf /etc/nginx/sites-enabled/default
-Removes default Nginx configurations that may cause conflicts.
+# Step 13: Remove old packages
+# Cleans up any outdated packages and configurations.
+echo "Removing old packages..."
+apt autoremove -y
+rm -rf /etc/nginx/sites-enabled/default
 
-16. Reboot the System
-   ```bash
-   reboot
-Reboots the server to apply all changes.
+echo "=== Upgrade process completed ==="
+
+# Step 14: Restart the system
+# Reboots the system to apply all the changes made during the upgrade.
+echo "Rebooting the system to apply changes..."
+reboot
