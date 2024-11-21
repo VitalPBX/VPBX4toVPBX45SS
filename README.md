@@ -26,8 +26,8 @@ Configuration Prompts During Script Execution
 
 When running the script, you may encounter prompts like the following:
    ```bash
-   *** mpm_event.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
-   *** firewalld.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
+   ** mpm_event.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
+   ** firewalld.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
 
 ---
 ## 📋 Script Steps
