@@ -37,52 +37,52 @@ apt autoremove --purge -y
 echo "Checking VitalPBX Integrityn..."
 vitalpbx check-integrity
 
-# Step 4: Change repositories to Debian 12 (bookworm) and VitalPBBX
+# Step 4: Remove Hotel Management Module (Deprecate in V4.5)
+apt remove vitalpbx-hotel-management -y
+
+# Step 5: Change repositories to Debian 12 (bookworm) and VitalPBBX
 echo "Updating repositories to Debian 12..."
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
 echo "Update VitalPBX Repo to V4.5:"
 sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
 
-# Step 5: Upgrade to Debian 12
+# Step 6: Upgrade to Debian 12
 # Set non-interactive mode globally
 export DEBIAN_FRONTEND=noninteractive
 
-# Prevent interactive prompts
+# Step 7: Prevent interactive prompts
 echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 echo "Updating the package list..."
 apt update -y
 
-# Update and upgrade the system
+# Step 8: Update and upgrade the system
 echo "Updating and upgrading the system..."
 apt upgrade -yq
 apt dist-upgrade -yq
 
-# Step 6: Clean up residual packages
+# Step 9: Clean up residual packages
 echo "Removing residual packages..."
 apt autoremove --purge -y
 apt clean -y
 
-# Step 7: Update GRUB bootloader
+# Step 10: Update GRUB bootloader
 echo "Updating GRUB..."
 update-grub
 
-# Step 8: Stop and disable apache2 service
+# Step 11: Stop and disable apache2 service
 systemctl stop apache2.service
 systemctl disable apache2.service
 apt remove apache2 -y
 
-# Step 9: Re-Install-Upgrade VitalPBX
+# Step 12: Re-Install-Upgrade VitalPBX
 apt reinstall vitalpbx -y
 
-# Step 10: Remove Hotel Management Module (Deprecate in V4.5)
-apt remove vitalpbx-hotel-management -y
-
-# Step 12: Remove old packages
+# Step 13: Remove old packages
 apt autoremove -y
 rm -rf /etc/nginx/sites-enabled/default
 echo "=== Upgrade process completed ==="
 
-# Step 13: Restart the system
+# Step 14: Restart the system
 echo "Rebooting the system to apply changes..."
 reboot
