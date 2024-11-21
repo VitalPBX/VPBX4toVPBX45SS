@@ -21,7 +21,7 @@ This script automates the process of upgrading a Debian 11 system to Debian 12 a
 3. Execute the script:
    ```bash
    ./vpbx4tovpbx45.sh
-4. Configuration Prompts During Script Execution
+4. Configuration Prompts During Script Execution<br>
 When running the script, you may encounter prompts like the following:
    ```bash
    *** mpm_event.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
