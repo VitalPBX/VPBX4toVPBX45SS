@@ -35,6 +35,10 @@ When running the script, you may encounter prompts like the following:
    *** mpm_event.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
    *** firewalld.conf (Y/I/N/O/D/Z) [default=N] ? <press Enter>
 
+5. Optional: Remove All Unused Kernels from Version 5.x
+   ```bash
+   dpkg --list | grep 'linux-image-5' | awk '{print $2}' | grep -v "$(uname -r)" | xargs sudo apt remove -y
+
 ---
 ## 📋 Detailed Explanation of Script Workflow
 
