@@ -41,14 +41,18 @@ echo "Updating repositories to Debian 12..."
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
 
 # Step 5: Upgrade to Debian 12
+# Set non-interactive mode globally
+export DEBIAN_FRONTEND=noninteractive
+
+# Prevent interactive prompts
+echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 echo "Updating the package list..."
-apt update
+apt update -y
 
-echo "Upgrading packages to Debian 12..."
-DEBIAN_FRONTEND=noninteractive apt upgrade -yq --force-confdef --force-confold
-
-echo "Performing a full system upgrade..."
-apt dist-upgrade -y
+# Update and upgrade the system
+echo "Updating and upgrading the system..."
+apt upgrade -yq --force-confdef --force-confold
+apt dist-upgrade -yq --force-confdef --force-confold
 
 # Step 6: Clean up residual packages
 echo "Removing residual packages..."
