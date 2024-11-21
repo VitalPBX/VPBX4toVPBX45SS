@@ -84,42 +84,42 @@ Updates the VitalPBX repository to point to version 4.5.
    export DEBIAN_FRONTEND=noninteractive
 Configures the system to avoid interactive prompts during the upgrade process.
 
-11. Upgrade to Debian 12
+10. Upgrade to Debian 12
    ```bash
    apt update -y
    apt upgrade -yq
    apt dist-upgrade -yq
 Performs the full upgrade to Debian 12.
 
-12. Clean Residual Packages
+11. Clean Residual Packages
    ```bash
    apt autoremove --purge -y
    apt clean -y
 Removes unnecessary files and packages left over from the upgrade.
 
-13. Update GRUB Bootloader
+12. Update GRUB Bootloader
    ```bash
    update-grub
 Updates the GRUB bootloader to reflect the changes in the system.
 
-14. Stop and Remove Apache
+13. Stop and Remove Apache
    ```bash
    systemctl stop apache2.service
    systemctl disable apache2.service
    apt remove apache2 -y
 Stops and removes Apache, as it is not required for VitalPBX.
 
-15. Reinstall VitalPBX
+14. Reinstall VitalPBX
    ```bash
    apt reinstall vitalpbx -y
 Reinstalls VitalPBX to ensure compatibility with Debian 12.
 
-16. Remove Old Nginx Configuration
+15. Remove Old Nginx Configuration
    ```bash
    rm -rf /etc/nginx/sites-enabled/default
 Removes default Nginx configurations that may cause conflicts.
 
-17. Reboot the System
+16. Reboot the System
    ```bash
    reboot
 Reboots the server to apply all changes.
