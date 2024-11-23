@@ -43,7 +43,6 @@ apt remove vitalpbx-hotel-management -y
 # Step 5: Stop and disable apache2 service
 systemctl stop apache2.service
 systemctl disable apache2.service
-apt remove apache2 -y
 
 # Step 6: Change repositories to Debian 12 (bookworm) and VitalPBBX
 echo "Updating repositories to Debian 12..."
@@ -75,14 +74,17 @@ apt clean -y
 echo "Updating GRUB..."
 update-grub
 
-# Step 12: Re-Install-Upgrade VitalPBX
+# Step 12: Remove Apache
+apt remove apache2 -y
+
+# Step 13: Re-Install-Upgrade VitalPBX
 apt reinstall vitalpbx -y
 
-# Step 13: Remove old packages
+# Step 14: Remove old packages
 apt autoremove -y
 rm -rf /etc/nginx/sites-enabled/default
 echo "=== Upgrade process completed ==="
 
-# Step 14: Restart the system
+# Step 15: Restart the system
 echo "Rebooting the system to apply changes..."
 reboot
