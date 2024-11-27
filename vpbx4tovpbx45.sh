@@ -80,11 +80,14 @@ apt remove apache2 -y
 # Step 13: Re-Install-Upgrade VitalPBX
 apt reinstall vitalpbx -y
 
-# Step 14: Remove old packages
+# Step 14: Update localhost
+sed -i 's/localhost/127.0.0.1/g'  /usr/share/vitalpbx/monitor/config.ini
+
+# Step 15: Remove old packages
 apt autoremove -y
 rm -rf /etc/nginx/sites-enabled/default
 echo "=== Upgrade process completed ==="
 
-# Step 15: Restart the system
+# Step 16: Restart the system
 echo "Rebooting the system to apply changes..."
 reboot
