@@ -1,93 +1,149 @@
 #!/bin/bash
 
+set -e
+
+# Functions for logging
+log() {
+    echo -e "\033[1;32m[INFO]\033[0m $1"
+}
+
+error() {
+    echo -e "\033[1;31m[ERROR]\033[0m $1"
+    exit 1
+}
+
+# Check for root permissions
+if [ "$EUID" -ne 0 ]; then
+    error "Please run this script with root privileges. Use 'su -' to switch to the root user."
+fi
+
+#Check OS Version
+os_codename=`cat /etc/os-release | grep -e VERSION_CODENAME | awk -F '=' '{print $2}' | xargs`
+if [ "$os_codename" != "bullseye" ]; then
+        error "This script must be run on Debian 11 (bullseye). Please ensure you are using the correct operating system."
+fi
+
+
 # Display warning in a bold, red format
 echo -e "\033[1;31m#########################################################\033[0m"
 echo -e "\033[1;31m#                      WARNING                          #\033[0m"
 echo -e "\033[1;31m#                                                       #\033[0m"
 echo -e "\033[1;31m# Migrating from Debian 11 to Debian 12 and upgrading   #\033[0m"
 echo -e "\033[1;31m# from VitalPBX 4 to VitalPBX 4.5 with this script      #\033[0m"
-echo -e "\033[1;31m# involves potential risks.                            #\033[0m"
+echo -e "\033[1;31m# involves potential risks.                             #\033[0m"
 echo -e "\033[1;31m#                                                       #\033[0m"
 echo -e "\033[1;31m# Take proper precautions, including creating backups   #\033[0m"
-echo -e "\033[1;31m# or snapshots and testing in a lab environment first. #\033[0m"
+echo -e "\033[1;31m# or snapshots and testing in a lab environment first.  #\033[0m"
 echo -e "\033[1;31m# Ensure you have a rollback plan before proceeding.    #\033[0m"
 echo -e "\033[1;31m#                                                       #\033[0m"
-echo -e "\033[1;31m# Run this script as root or with sudo privileges.      #\033[0m"
+echo -e "\033[1;31m# During the upgrade, press [ENTER] whenever prompted.  #\033[0m"
 echo -e "\033[1;31m#########################################################\033[0m"
 
-read -p "Are you sure you want to proceed? (yes/no): " confirmation
-# Check the user's input
-if [[ "$confirmation" != "yes" ]]; then
-    echo "Upgrade process canceled by the user."
-    exit 1
+# Prompt the user about making a backup
+read -p "Do you want to continue? [Y/N]: " proceed
+
+if [[ ! "$proceed" =~ ^[Yy]$ ]]; then
+    log "Migration process aborted by the user."
+    exit 0
 fi
 
-echo "=== Starting the upgrade process from Debian 11 to Debian 12 ==="
+# 1. Upgrade the machine to the latest version of Bullseye
+log "Updating Debian Bullseye to the latest available version..."
+DEBIAN_FRONTEND=noninteractive apt update
+DEBIAN_FRONTEND=noninteractive apt upgrade -y
+log "Bullseye version updated successfully."
 
-# Step 1: Update the current system
-echo "Updating the current system..."
-apt update && apt upgrade -y
-apt dist-upgrade -y
-
-# Step 2: Remove unnecessary packages
-echo "Removing unnecessary packages..."
-apt autoremove --purge -y
-
-# Step 3: Check VitalPBX Integrity
-echo "Checking VitalPBX Integrityn..."
-vitalpbx check-integrity
-
-# Step 4: Remove Hotel Management Module (Deprecate in V4.5)
-apt remove vitalpbx-hotel-management -y
-
-# Step 5: Stop and disable apache2 service
-systemctl stop apache2.service
-systemctl disable apache2.service
-
-# Step 6: Change repositories to Debian 12 (bookworm) and VitalPBBX
-echo "Updating repositories to Debian 12..."
+# 2. Update Debian sources for the distribution upgrade
+log "Updating Debian sources from Bullseye to Bookworm..."
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
-sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
-echo "Update VitalPBX Repo to V4.5:"
-sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
+sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*.list
+log "Repository files updated for Debian Bookworm."
 
-# Step 7: Upgrade to Debian 12
-# Set non-interactive mode globally
-export DEBIAN_FRONTEND=noninteractive
+# 3. Hold VitalPBX Packages
+log "Holding VitalPBX packages to avoid removal..."
+apt-mark hold $(dpkg-query -f '${binary:Package}\n' -W 'vitalpbx*')
+apt-mark hold logger-core
+apt-mark hold provisioning-core 2>/dev/null || log "Package 'provisioning-core' not found."
+apt-mark hold vitxi 2>/dev/null || log "Package 'vitxi' not found."
+apt-mark hold $(dpkg-query -f '${binary:Package}\n' -W 'sonata-*') 2>/dev/null || log "No Sonata add-ons."
 
-# Step 8: Prevent interactive prompts
-echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-echo "Updating the package list..."
-apt update -y
+# 4. Step 1 of upgrading the system
+log "Performing an in-place package upgrade without installing new packages..."
+DEBIAN_FRONTEND=noninteractive apt update
+DEBIAN_FRONTEND=noninteractive apt upgrade --without-new-pkgs -y
+log "In-place upgrade completed."
 
-# Step 9: Update and upgrade the system
-echo "Updating and upgrading the system..."
-apt upgrade -yq
-apt dist-upgrade -yq
+# 5. Step 2 of upgrading the system
+log "Performing a full system upgrade..."
+DEBIAN_FRONTEND=noninteractive apt update
+DEBIAN_FRONTEND=noninteractive apt full-upgrade -y
+log "Full system upgrade completed successfully."
 
-# Step 10: Clean up residual packages
-echo "Removing residual packages..."
-apt autoremove --purge -y
-apt clean -y
+# 6. Unhold VitalPBX Packages
+log "Unholding VitalPBX packages..."
+apt-mark unhold $(dpkg-query -f '${binary:Package}\n' -W 'vitalpbx*')
+apt-mark unhold logger-core
+apt-mark unhold provisioning-core 2>/dev/null || log "Package 'provisioning-core' not found."
+apt-mark unhold vitxi 2>/dev/null || log "Package 'vitxi' not found."
+apt-mark unhold $(dpkg-query -f '${binary:Package}\n' -W 'sonata-*') 2>/dev/null || log "No Sonata add-ons."
 
-# Step 11: Update GRUB bootloader
-echo "Updating GRUB..."
-update-grub
+# 7. Update VitalPBX repository to v4.5
+log "Updating VitalPBX repository to version 4.5..."
+vitalpbx_repo="/etc/apt/sources.list.d/vitalpbx.list"
+sed -i 's/v4/v4.5/g' $vitalpbx_repo
+log "Updated repository file: $vitalpbx_repo"
 
-# Step 12: Remove Apache
-apt remove apache2 -y
+# 8. Disable Apache before upgrading to VitalPBX v4.5
+log "Disabling Apache2..."
+systemctl stop apache2
+systemctl disable apache2
+sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
+sed -i "s/Listen 443/Listen 4443/" /etc/apache2/ports.conf
+sed -i "s/<VirtualHost \*:80>/<VirtualHost *:8080>/" /etc/apache2/sites-available/vitalpbx.conf
+sed -i "s/<VirtualHost \*:443>/<VirtualHost *:4443>/" /etc/apache2/sites-available/vitalpbx.conf
+sed -i "s/<VirtualHost \*:3500>/<VirtualHost *:2500>/" /etc/apache2/sites-available/vitalpbx.conf
+sed -i "s/<VirtualHost \*:3501>/<VirtualHost *:2501>/" /etc/apache2/sites-available/vitalpbx.conf
+log "Apache is stopped and disable..."
 
-# Step 13: Re-Install-Upgrade VitalPBX
-apt reinstall vitalpbx -y
+# 9. Upgrade VitalPBX Packages
+log "Upgrade VitalPBX packages..."
+apt update
+apt upgrade -y
 
-# Step 14: Update localhost
-sed -i 's/localhost/127.0.0.1/g'  /usr/share/vitalpbx/monitor/config.ini
+# 10. Configure Firewall and Optimize Server
+log "Updating and configuring the firewall..."
+sed -i '/<source ipset=".*"\/>/d' /etc/firewalld/zones/drop.xml
+php /usr/share/vitalpbx/scripts/configure_fail2ban
+php /usr/share/vitalpbx/scripts/build_firewall
+php /usr/share/vitalpbx/scripts/vitalpbx "optimizeMariaDB"
+php /usr/share/vitalpbx/scripts/vitalpbx "optimizeNginxSettings"
+php /usr/share/vitalpbx/scripts/vitalpbx "optimizePHPFPM"
+php /usr/share/vitalpbx/scripts/vitalpbx "optimizeServerSettings"
 
-# Step 15: Remove old packages
-apt autoremove -y
-rm -rf /etc/nginx/sites-enabled/default
-echo "=== Upgrade process completed ==="
+# 11. Remove obsolete packages
+log "Removing obsolete packages..."
+DEBIAN_FRONTEND=noninteractive apt --purge autoremove -y
+DEBIAN_FRONTEND=noninteractive apt autoclean -y
+log "Obsolete packages removed."
 
-# Step 16: Restart the system
-echo "Rebooting the system to apply changes..."
+# 12. Remove Apache
+log "Removing Apache..."
+systemctl stop apache2
+systemctl disable apache2
+rm -rf /var/lib/apache2/*  2>/dev/null || log "No Apache2 bin directory."
+DEBIAN_FRONTEND=noninteractive apt remove -y apache2
+DEBIAN_FRONTEND=noninteractive apt --purge autoremove -y
+log "Apache removed successfully."
+
+# 13. Remove Nginx Default site
+log "Disabling Nginx default site..."
+unlink /etc/nginx/sites-enabled/default 2>/dev/null || log "No default nginx site present."
+log "Nginx default site disabled..."
+
+# 14. Cleanup
+log "Performing final cleanup..."
+DEBIAN_FRONTEND=noninteractive apt autoclean -y
+
+# 15. Reboot the server
+log "Migration completed successfully. The system will now reboot."
 reboot
