@@ -1,7 +1,9 @@
 # Debian Upgrade and Cleanup Script (Including VitalPBX 4 to 4.5 Migration)
 
-This script automates the process of upgrading a Debian 11 system to Debian 12 and includes a seamless migration from **VitalPBX 4** to **VitalPBX 4.5**, along with cleanup tasks to optimize the environment. It is especially useful for testing environments but can be used in production systems **at your own risk**.
+This script automates the process of upgrading a Debian 11 system to Debian 12 and includes a seamless migration from **VitalPBX 4** to **VitalPBX 4.5**, along with cleanup tasks to optimize the environment.<br> 
+Before upgrading your system, it is strongly recommended that you make a full backup, or at least back up any data or configuration information you can't afford to lose. The upgrade tools and process are quite reliable, but a hardware failure in the middle of an upgrade could result in a severely damaged system.
 
+https://www.debian.org/releases/stable/i386/release-notes/ch-upgrading.html
 ---
 
 # ⚠️ Warning
