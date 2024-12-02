@@ -48,82 +48,72 @@ dpkg --list | grep 'linux-image-5' | awk '{print $2}' | grep -v "$(uname -r)" | 
 ---
 ## 📋 How the Script Works
 
-**Step 1:** Update the current system
-Ensures all current packages on Debian 11 are up-to-date.
+**Step 1:** Upgrade Current System (Bullseye)
+Upgrades the current system to the latest version available for Debian 11.
 ```
-apt update && apt upgrade -y
-apt dist-upgrade -y
+DEBIAN_FRONTEND=noninteractive apt update
+DEBIAN_FRONTEND=noninteractive apt upgrade -y
 ```
-**Step 2:** Remove unnecessary packages
-Cleans up packages that are no longer needed.
-```
-apt autoremove --purge -y
-```
-**Step 3:** Check VitalPBX Integrity
-Verifies that the VitalPBX installation is valid before upgrading.
-```
-vitalpbx check-integrity
-```
-**Step 4:** Remove Hotel Management Module (Temporarily unavailable in V4.5)
-Uninstalls the hotel management module, which is no longer supported in version 4.5.
-```
-apt remove vitalpbx-hotel-management -y
-```
-**Step 5:** Change repositories to Debian 12 (bookworm) and VitalPBX
-Updates the Debian and VitalPBX repositories to point to the new versions.
+**Step 2:** Update Sources to Debian 12 (Bookworm)
+Updates APT source files to point to Debian 12 repositories.
 ```
 sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
-sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*
+sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list.d/*.list
+```
+**Step 3:** Hold VitalPBX Packages
+Prevents critical VitalPBX packages from being removed or modified during the upgrade.
+```
+apt-mark hold $(dpkg-query -f '${binary:Package}\n' -W 'vitalpbx*')
+apt-mark hold logger-core
+apt-mark hold provisioning-core
+apt-mark hold vitxi
+apt-mark hold $(dpkg-query -f '${binary:Package}\n' -W 'sonata-*')
+```
+**Step 4:** Perform a Complete Upgrade
+Executes a system upgrade in two stages: first without installing new packages, followed by a full upgrade.
+```
+DEBIAN_FRONTEND=noninteractive apt upgrade --without-new-pkgs -y
+DEBIAN_FRONTEND=noninteractive apt full-upgrade -y
+```
+**Step 5:** Unhold VitalPBX Packages
+Releases held VitalPBX packages to allow further updates.
+```
+apt-mark unhold $(dpkg-query -f '${binary:Package}\n' -W 'vitalpbx*')
+apt-mark unhold logger-core
+```
+**Step 6:** Update VitalPBX Repository
+Modifies the VitalPBX repository file to point to version 4.5..
+```
 sed -i 's/v4/v4.5/g' /etc/apt/sources.list.d/vitalpbx.list
 ```
-**Step 6:** Upgrade to Debian 12
-Prepares the system for non-interactive operations during the upgrade.
+**Step 7:** Disable Apache2
+Stops and disables Apache2, modifying its configuration to avoid port conflicts.
 ```
-export DEBIAN_FRONTEND=noninteractive
+systemctl stop apache2
+systemctl disable apache2
+sed -i "s/Listen 80/Listen 8080/" /etc/apache2/ports.conf
 ```
-**Step 7:** Prevent interactive prompts
-Ensures no manual input is required during the package upgrades.
+**Step 8:** Upgrade VitalPBX
+Updates VitalPBX packages to version 4.5.
 ```
-echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+apt update
+apt upgrade -y
 ```
-**Step 8:** Update and upgrade the system
-Performs the full system upgrade to Debian 12.
+**Step 9:** Optimize the Server
+Runs scripts to optimize MariaDB, Nginx, and other VitalPBX-related configurations.
 ```
-apt update -y
-apt upgrade -yq
-apt dist-upgrade -yq
+php /usr/share/vitalpbx/scripts/vitalpbx "optimizeMariaDB"
+php /usr/share/vitalpbx/scripts/vitalpbx "optimizeNginxSettings"
 ```
-**Step 9:** Clean up residual packages
-Removes unnecessary residual packages and cleans cached files.
+**Step 10:** Remove Obsolete Packages
+Cleans up unused packages and performs general system cleanup.
 ```
-apt autoremove --purge -y
-apt clean -y
+DEBIAN_FRONTEND=noninteractive apt --purge autoremove -y
+DEBIAN_FRONTEND=noninteractive apt autoclean -y
 ```
-**Step 10:** Update GRUB bootloader
-Updates GRUB to reflect the changes in the system.
-```
-update-grub
-```
-**Step 11:** Stop and disable apache2 service
-Stops and removes the Apache2 web server, as it is not needed for VitalPBX.
-```
-systemctl stop apache2.service
-systemctl disable apache2.service
-apt remove apache2 -y
-```
-**Step 12:** Re-Install-Upgrade VitalPBX
-Reinstalls VitalPBX to ensure compatibility with the new system.
-```
-apt reinstall vitalpbx -y
-```
-**Step 13:** Remove old packages
-Cleans up any outdated packages and configurations.
-```
-apt autoremove -y
-rm -rf /etc/nginx/sites-enabled/default
-```
-**Step 14:** Restart the system
-Reboots the system to apply all the changes made during the upgrade.
+**Step 11:** Reboot the Server
+Reboots the system to apply all changes.
 ```
 reboot
 ```
+
