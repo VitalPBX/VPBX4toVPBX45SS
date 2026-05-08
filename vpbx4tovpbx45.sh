@@ -47,6 +47,9 @@ if [[ ! "$proceed" =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
+# 0. Disable Deprecated Repo from Debian 11
+sed -i 's|^deb http://deb.debian.org/debian bullseye-backports main|#&|; s|^deb-src http://deb.debian.org/debian bullseye-backports main|#&|' /etc/apt/sources.list
+
 # 1. Upgrade the machine to the latest version of Bullseye
 log "Updating Debian Bullseye to the latest available version..."
 DEBIAN_FRONTEND=noninteractive apt update
